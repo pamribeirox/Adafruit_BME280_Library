@@ -136,12 +136,12 @@ bool Adafruit_BME280::init()
     }
 
 	if(!_i2caddr) { // Address autoselect plug & play
-		_wire.beginTransmission(BME280_ADDRESS_SDO_HIGH); // Try if 0x77 is alive
-		if(_wire.endTransmission() == 0) 
+		_wire->beginTransmission(BME280_ADDRESS_SDO_HIGH); // Try if 0x77 is alive
+		if(_wire->endTransmission() == 0) 
 			_i2caddr = BME280_ADDRESS_SDO_HIGH;
 		else {
-			_wire.beginTransmission(BME280_ADDRESS_SDO_LOW); // Try if 0x76 is alive
-			if(_wire.endTransmission() == 0)
+			_wire->beginTransmission(BME280_ADDRESS_SDO_LOW); // Try if 0x76 is alive
+			if(_wire->endTransmission() == 0)
 				_i2caddr = BME280_ADDRESS_SDO_LOW;
 			else
 				return false; // No device answers at known addresses for BMP280 & BME280
@@ -638,8 +638,8 @@ float Adafruit_BME280::seaLevelForAltitude(float altitude, float atmospheric)
 /**************************************************************************/
 boolean Adafruit_BME280::chipOk()
 	if(!_chipID) return false;
-	_wire.beginTransmission(_i2caddr);
-	return (_wire.endTransmission() == 0);
+	_wire->beginTransmission(_i2caddr);
+	return (_wire->endTransmission() == 0);
 }
 
 #ifndef BME280_NOINFO
