@@ -1,11 +1,17 @@
 # Adafruit BME280 Library [![Build Status](https://travis-ci.org/adafruit/Adafruit_BME280_Library.svg?branch=master)](https://travis-ci.org/adafruit/Adafruit_BME280_Library)
 
-<a href="http://www.adafruit.com/products/2652"><img src="./assets/board.jpg" width="500"/></a>
+<img src="https://cdn-shop.adafruit.com/970x728/2652-00.jpg" height="300"/>
 
-This is a library for the Adafruit BME280 Humidity, Barometric Pressure + Temp sensor
+This is a library for the Adafruit BME280/BMP280 Humidity, Barometric Pressure + Temp sensor
 
 Designed specifically to work with the Adafruit BME280 Breakout 
  * http://www.adafruit.com/products/2652
+ 
+NOTE: (pamribeirox):
+I've made a few changes to enable BMP280 compatibility.
+This fork of the library can be used for both sensors without the need for separate libraries.
+When begin() is called without any parameter or with I2C address of 0 the library will detect
+the right address (0x76 or 0x77) and enable the detected sensor (BME or BMP).
 
 These sensors use I2C or SPI to communicate, up to 4 pins are required to interface
 

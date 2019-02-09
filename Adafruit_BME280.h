@@ -12,6 +12,7 @@
  * products from Adafruit!
  *
  * Written by Kevin "KTOWN" Townsend for Adafruit Industries.
+ * Updated by Pedro Ribeiro (pamribeirox@gmail.com) for BMP280 compatibility
  *
  * BSD license, all text here must be included in any redistribution.
  *
@@ -29,12 +30,16 @@
 #include <Adafruit_Sensor.h>
 #include <Wire.h>
 
+/* defining BME280_NOINFO remove the sensorInfo() function and allows some memory saving if unneeded */
+//#define BME280_NOINFO		   
 /**************************************************************************/
 /*! 
     @brief  default I2C address
 */
 /**************************************************************************/
-    #define BME280_ADDRESS                (0x77)
+    #define BME280_ADDRESS_SDO_LOW        (0x76)
+    #define BME280_ADDRESS_SDO_HIGH       (0x77)
+	#define BME280_ADDRESS BME280_ADDRESS_SDO_HIGH
 /*=========================================================================*/
 
 /**************************************************************************/
@@ -110,27 +115,6 @@
     } bme280_calib_data;
 /*=========================================================================*/
 
-/*
-class Adafruit_BME280_Unified : public Adafruit_Sensor
-{
-  public:
-    Adafruit_BME280_Unified(int32_t sensorID = -1);
-
-    bool  begin(uint8_t addr = BME280_ADDRESS);
-    void  getTemperature(float *temp);
-    void  getPressure(float *pressure);
-    float pressureToAltitude(float seaLevel, float atmospheric, float temp);
-    float seaLevelForAltitude(float altitude, float atmospheric, float temp);
-    void  getEvent(sensors_event_t*);
-    void  getSensor(sensor_t*);
-
-  private:
-    uint8_t   _i2c_addr;
-    int32_t   _sensorID;
-};
-
-*/
-
 /**************************************************************************/
 /*! 
     @brief  Class that stores state and functions for interacting with BME280 IC
@@ -183,23 +167,31 @@ class Adafruit_BME280 {
         /**************************************************************************/
         enum standby_duration {
             STANDBY_MS_0_5  = 0b000,
-            STANDBY_MS_10   = 0b110,
-            STANDBY_MS_20   = 0b111,
+            STANDBY_MS_10   = 0b110, // BME280 only
+            STANDBY_MS_20   = 0b111, // BME280 only
             STANDBY_MS_62_5 = 0b001,
             STANDBY_MS_125  = 0b010,
             STANDBY_MS_250  = 0b011,
             STANDBY_MS_500  = 0b100,
-            STANDBY_MS_1000 = 0b101
+            STANDBY_MS_1000 = 0b101,
+            STANDBY_MS_2000 = 0b110, // BMP280 only
+            STANDBY_MS_4000 = 0b111  // BMP280 only
         };
+		
+		enum chip_ids {
+			BME280_ID = 0x60,
+			BMP280_ID = 0x58,
+			BMP280_SAMPLE57_ID = 0x57,
+			BMP280_SAMPLE56_ID = 0x56
+		};
     
         // constructors
         Adafruit_BME280(void);
         Adafruit_BME280(int8_t cspin);
         Adafruit_BME280(int8_t cspin, int8_t mosipin, int8_t misopin, int8_t sckpin);
 		
-		bool begin(void);
 		bool begin(TwoWire *theWire);
-		bool begin(uint8_t addr);
+		bool begin(uint8_t addr = 0 /* Default autoselect */);
         bool begin(uint8_t addr, TwoWire *theWire);
 		bool init();
 
@@ -219,6 +211,11 @@ class Adafruit_BME280 {
         float readAltitude(float seaLevel);
         float seaLevelForAltitude(float altitude, float pressure);
 
+        inline int8_t chipID() { return _chipID; };
+        inline int8_t chipAddr() { return _i2caddr; };
+#ifndef BME280_NOINFO
+		const char* chipInfo();
+#endif
         
     private:
 		TwoWire *_wire;
@@ -234,6 +231,7 @@ class Adafruit_BME280 {
         uint16_t  read16_LE(byte reg); // little endian
         int16_t   readS16_LE(byte reg); // little endian
 
+		uint8_t   _chipID;					
         uint8_t   _i2caddr;
         int32_t   _sensorID;
         int32_t   t_fine;
