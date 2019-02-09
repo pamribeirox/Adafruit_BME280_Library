@@ -136,12 +136,12 @@ bool Adafruit_BME280::init()
     }
 
 	if(!_i2caddr) { // Address autoselect plug & play
-		Wire.beginTransmission(BME280_ADDRESS_SDO_HIGH); // Try if 0x77 is alive
-		if(Wire.endTransmission() == 0) 
+		_wire.beginTransmission(BME280_ADDRESS_SDO_HIGH); // Try if 0x77 is alive
+		if(_wire.endTransmission() == 0) 
 			_i2caddr = BME280_ADDRESS_SDO_HIGH;
 		else {
-			Wire.beginTransmission(BME280_ADDRESS_SDO_LOW); // Try if 0x76 is alive
-			if(Wire.endTransmission() == 0)
+			_wire.beginTransmission(BME280_ADDRESS_SDO_LOW); // Try if 0x76 is alive
+			if(_wire.endTransmission() == 0)
 				_i2caddr = BME280_ADDRESS_SDO_LOW;
 			else
 				return false; // No device answers at known addresses for BMP280 & BME280
@@ -626,6 +626,20 @@ float Adafruit_BME280::seaLevelForAltitude(float altitude, float atmospheric)
     //  http://forums.adafruit.com/viewtopic.php?f=22&t=58064
 
     return atmospheric / pow(1.0 - (altitude/44330.0), 5.255);
+}
+
+/**************************************************************************/
+/*!
+    Returns true if a valid chip has been detected on init() and the chip
+	is still answering to I2C transmissions to his address
+    @param  atmospheric   Atmospheric pressure in hPa
+    @returns true on detected and answering chip
+*/
+/**************************************************************************/
+boolean Adafruit_BME280::chipOk()
+	if(!_chipID) return false;
+	_wire.beginTransmission(_i2caddr);
+	return (_wire.endTransmission() == 0);
 }
 
 #ifndef BME280_NOINFO

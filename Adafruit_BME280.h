@@ -213,6 +213,7 @@ class Adafruit_BME280 {
 
         inline int8_t chipID() { return _chipID; };
         inline int8_t chipAddr() { return _i2caddr; };
+		boolean chipOk();
 #ifndef BME280_NOINFO
 		const char* chipInfo();
 #endif
