@@ -636,7 +636,7 @@ float Adafruit_BME280::seaLevelForAltitude(float altitude, float atmospheric)
     @returns true on detected and answering chip
 */
 /**************************************************************************/
-boolean Adafruit_BME280::chipOk()
+boolean Adafruit_BME280::chipOk() {
 	if(!_chipID) return false;
 	_wire->beginTransmission(_i2caddr);
 	return (_wire->endTransmission() == 0);
